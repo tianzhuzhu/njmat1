@@ -84,6 +84,15 @@ def findDepartmentBygroup(x):
         return '雨花台'
 
 
+def findHandDepatment(d1, d2):
+
+    if d2.upper()!='NAN' and d2.upper()!='NA' and d2.upper()!='':
+        print(d2)
+        return d2
+    if d1.upper() != 'NAN' and d1.upper() != 'NA' and d1.upper() != '':
+        print(d1)
+        return d1
+
 
 def handleData(data, matchup,path,mode):
     matchup.rename(columns={"行标签":"处理组"},inplace=True)
@@ -92,8 +101,23 @@ def handleData(data, matchup,path,mode):
     data['处理人'] = df[0]
     data['处理组']=df[1]
     print(data['处理组'])
+    a=[1,2,4,5]
+    if('部门' in data.columns.tolist()):
+        data['部门2']=data['部门']
+        columns = data.columns.tolist()
+        columns.remove('部门')
+        print('columns:',columns)
+        data=pd.DataFrame(data,columns=columns)
     mergeData=pd.merge(left=data,right=matchup,on='处理组',how='left')
+    print('--------------merge--------------')
+    print(mergeData)
+    if ('部门2' in mergeData.columns.tolist()):
+        print('----------已有部分部门数据进行apply方法----------')
+        mergeData['部门']=mergeData.apply(lambda x:findHandDepatment(str(x['部门']),str(x['部门2'])),axis=1)
+        mergeData = pd.DataFrame(mergeData, columns=mergeData.columns.tolist().remove('部门2'))
+    print(mergeData)
     columns=mergeData.columns.tolist()
+
     toFifth=['处理人','处理组','部门']
     for v in columns:
        if(v in toFifth):
@@ -102,14 +126,20 @@ def handleData(data, matchup,path,mode):
     columns.remove('组/处理人')
     mergeData=mergeData.reindex(columns=columns)
     #根据处理组头匹配
-    na=mergeData.loc[mergeData['部门'].isna()].apply(lambda x: findDepartmentBygroup(x['处理组']), axis=1)
+    print('-------------merge完成-----------')
+    print(mergeData)
     print(mergeData.loc[mergeData['部门'].isna()])
+    na=mergeData.loc[mergeData['部门'].isna()].apply(lambda x: findDepartmentBygroup(x['处理组']), axis=1)
+
     print(' ---------自动填充--------')
     print(na)
     print(mergeData.loc[mergeData['部门'].isna()])
     mergeData.loc[mergeData['部门'].isna(),'部门']=na
     print(mergeData)
-    # 需要丢弃 todo
+
+    #丢弃部门为客調的
+    kediao=mergeData.loc[mergeData['部门']=='客调']
+    mergeData=mergeData.loc[mergeData['部门']!='客调']
 #数据已经融合，接下来根据历时进行拆分
     NADATA=mergeData.loc[mergeData['部门'].isna()].copy()
     mergeData.dropna(subset=['部门'],inplace=True)
@@ -127,6 +157,8 @@ def handleData(data, matchup,path,mode):
     pviotAndOutput(lessThanSevenData,'未超时七天',path,mode)
     if(not NADATA.empty):
         NADATA.to_excel(os.path.join(path,mode+'未匹配到部门.xlsx'))
+    if (not kediao.empty):
+        kediao.to_excel(os.path.join(path,mode+'客调.xlsx'))
 
 #完成拆分分别在 mergedata appendData less thansevendata中 ，mergedata加入一列
 

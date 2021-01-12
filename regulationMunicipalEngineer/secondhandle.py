@@ -39,7 +39,13 @@ def last_day_of_month(any_day):
     """
     next_month = any_day.replace(day=28) + datetime.timedelta(days=4)  # this will never fail
     return next_month - datetime.timedelta(days=next_month.day)
+def getOutPutName(file):
 
+    l = file.rfind('\\')
+    r = file.rfind('月')
+    path=file[:l]
+    mo = file[l+1:r]
+    return path
 # 注意: 年月日，这些变量必须是数字，否则报错！
 year = 2019 # 年
 month = 5  # 月
@@ -51,14 +57,7 @@ def removeUnameColumns(data):
         if(i.startswith('Unnamed')):
             columns.remove(i)
     return pd.DataFrame(data,columns=columns)
-def getOutPutName(file):
 
-    l = file.rfind('\\')
-    r = file.rfind('月')
-    path=file[:l]
-    mo = file[l+1:r]
-    path=os.path.join(path,'result')
-    return path
 
 def others(data):
     str1=''
@@ -108,7 +107,12 @@ if __name__=="__main__":
     print('------------产生word文件---------------')
 
     file1=input('请输入市政工程位置：')
+    while(file1.rfind('市政工程')<file1.rfind('整治工单')):
+        file1 = input('请确认市政工程位置：')
     file2 = input('请输入整治工程位置：')
+    while (file2.rfind('市政工程') > file2.rfind('整治工单')):
+        file2 = input('请确认市政工程位置：')
+    path=getOutPutName(file1)
     tomonth = datetime.datetime.now().month
     today=datetime.datetime.now().day
     print(today)
@@ -123,12 +127,12 @@ if __name__=="__main__":
     total,numofmtsd,numofltsd,str1,str2=readexcel(file1)
     print('------------------------')
     print(total)
-    pf2=pf2.format(tomonth,day,total,numofmtsd,str1,numofltsd,str2)
+    pf2=pf2.format(tomonth,today,total,numofmtsd,str1,numofltsd,str2)
     print(pf2)
     pf3='  截止{}月{}日在途整治工单共{}件。在途超时7天工单{}件，其中{}；在途未超7天工单{}件，其中{}，详情见附件。'
     total, numofmtsd, numofltsd, str1, str2 = readexcel(file2)
 
-    pf3 = pf3.format(tomonth, day, total, numofmtsd, str1, numofltsd, str2)
+    pf3 = pf3.format(tomonth, today, total, numofmtsd, str1, numofltsd, str2)
     print(pf3)
     pf4='  现将要求通知如下：'
     pf5=' 一、在途超时7天工单'
@@ -155,4 +159,5 @@ if __name__=="__main__":
     paragraph10 = document.add_paragraph(pf10)
     paragraph11 = document.add_paragraph(pf11)
     paragraph12 = document.add_paragraph(pf12)
-    document.save(str(tomonth)+'月'+str(today)+'日'+"市政工程整治工单通报.docx")
+
+    document.save(os.path.join(path,str(tomonth)+'月'+str(today)+'日'+"市政工程整治工单通报.docx"))
