@@ -9,20 +9,20 @@ import pandas as pd
 def checkin():
     tomonth = datetime.datetime.now().month
     today = datetime.datetime.now().day
-    while(True):
-        mode=input("请输入模式：1 市政工程 2 整治工单")
-        mode= "市政工程" if mode=='1' else "整治工单" if mode=='2' else ''
-        print( mode+str(tomonth) + "-" + str(today) )
+
+    mode=input("请输入模式：1 市政工程 2 整治工单")
+    mode= "市政工程" if mode=='1' else "整治工单" if mode=='2' else ''
+    print( mode+str(tomonth) + "-" + str(today) )
+    file = input("今天是{},请输入需要归档清单原表格绝对路径（格式为{}mm-dd.xlsx）):".format(datetime.date.today().strftime(r"%y-%m-%d"),mode))
+    while(file.find(str(tomonth)+"-"+str(today))<0 and file.find(mode)<0):
         file = input("今天是{},请输入需要归档清单原表格绝对路径（格式为{}mm-dd.xlsx）):".format(datetime.date.today().strftime(r"%y-%m-%d"),mode))
-        while(file.find(str(tomonth)+"-"+str(today))<0 and file.find(mode)<0):
-            file = input("今天是{},请输入需要归档清单原表格绝对路径（格式为{}mm-dd.xlsx）):".format(datetime.date.today().strftime(r"%y-%m-%d"),mode))
-        data=pd.read_excel(file,sheet_name='data')
-        matchup=input('工单归属关系表绝对路径（格式为*归属关系.xlsx）:')
-        while(matchup.find('归属关系')<0):
-            matchup = input('工单归属关系表绝对路径（格式为*归属关系.xlsx）:')
-        matchup=pd.read_excel(matchup,sheet_name="部门")
-        path=file[:file.rfind('\\')]
-        return data,mode,matchup,path
+    data=pd.read_excel(file,sheet_name='data')
+    matchup=input('工单归属关系表绝对路径（格式为*归属关系.xlsx）:')
+    while(matchup.find('归属关系')<0):
+        matchup = input('工单归属关系表绝对路径（格式为*归属关系.xlsx）:')
+    matchup=pd.read_excel(matchup,sheet_name="部门")
+    path=file[:file.rfind('\\')]
+    return data,mode,matchup,path
 
 
 def IsMoreThanSevenDay(x):
@@ -163,5 +163,6 @@ def handleData(data, matchup,path,mode):
 #完成拆分分别在 mergedata appendData less thansevendata中 ，mergedata加入一列
 
 if __name__ == '__main__':
-    data,mode,matchup,path= checkin()
-    handleData(data,matchup,path,mode)
+    while(True):
+        data,mode,matchup,path= checkin()
+        handleData(data,matchup,path,mode)
