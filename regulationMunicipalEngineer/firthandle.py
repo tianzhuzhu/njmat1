@@ -61,6 +61,30 @@ def pviotAndOutput(data, name,path,mode):
         data.to_excel(writer, sheet_name=name,index=False)
 
 
+def findDepartmentBygroup(x):
+    x=str(x)
+    list=['溧水','六合','江宁','高淳','浦口']
+    for i in list:
+        print(i)
+        if x.find(i)>=0:
+            return i
+    list=['维护岗','PON','光缆','设备']
+    for i in list:
+        if x.find(i)>=0:
+            return '综维'
+    list=['建设','有线接入']
+    for i in list:
+        if x.find(i)>=0:
+            return '建设'
+    list = ['秦淮', '鼓楼','雨花台','玄武','栖霞','化工园','建业']
+    for i in list:
+        if x.find(i) >= 0:
+            return i
+    if(x.find('雨花')>=0):
+        return '雨花台'
+
+
+
 def handleData(data, matchup,path,mode):
     matchup.rename(columns={"行标签":"处理组"},inplace=True)
     print(matchup)
@@ -77,9 +101,17 @@ def handleData(data, matchup,path,mode):
            columns.insert(4,v)
     columns.remove('组/处理人')
     mergeData=mergeData.reindex(columns=columns)
+    #根据处理组头匹配
+    na=mergeData.loc[mergeData['部门'].isna()].apply(lambda x: findDepartmentBygroup(x['处理组']), axis=1)
+    print(mergeData.loc[mergeData['部门'].isna()])
+    print(' ---------自动填充--------')
+    print(na)
+    print(mergeData.loc[mergeData['部门'].isna()])
+    mergeData.loc[mergeData['部门'].isna(),'部门']=na
     print(mergeData)
+    # 需要丢弃 todo
 #数据已经融合，接下来根据历时进行拆分
-    NADATA=mergeData.loc[mergeData['部门'].isna()]
+    NADATA=mergeData.loc[mergeData['部门'].isna()].copy()
     mergeData.dropna(subset=['部门'],inplace=True)
     mergeData.sort_values(by='截止时间',inplace=True,ascending=True)
     MoreThanSevenDay=mergeData.loc[mergeData['剩余历时'].map(lambda x:IsMoreThanSevenDay(x))==True]
