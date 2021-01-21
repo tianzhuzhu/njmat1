@@ -7,3 +7,4 @@ build
 venv
 *.docx
 /regulationMunicipalEngineer/1月11日市政工程整治工单通报.docx
+/*.bat

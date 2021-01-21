@@ -15,6 +15,7 @@ def citymorethansevendays(moretsc):
     str1=''
     count = 0
     lastcount = 0
+
     for index, row in moretsc.iterrows():
         count = count + 1
         if (row['部门'] != '总计'):
@@ -65,10 +66,10 @@ def others(data):
     lastcount = 0
     for index, row in data.iterrows():
         count = count + 1
+        if (count >= 4 and lastcount != row['汇总']):
+            break
         if (row['部门'] != '总计'):
             str1 += row['部门'] + row['汇总'] + '件、'
-        if (count >= 3 and lastcount != row['汇总']):
-            break
         lastcount = row['汇总']
     str1 = str1[0:-1]
     print(str1)
@@ -142,9 +143,8 @@ if __name__=="__main__":
     pf8='1、{0}月{1}日下班前联系用户核实、处理、归档。如有问题，请反馈原因。'
     pf8=pf8.format(str(tomonth),lastday)
     pf9='2、对拆迁地、施工工地、外力影响等不可抗力因素导致暂时无法修复的，上传照片，每周联系用户，反馈有效处理进展。'
-    pf10='整治工单和长时间整治不到位或整治时间超过30天，且涉嫌随意回单的，按工单量考核到部门，≤10'
-    pf11='单考核50元，每增加10单追加考核50元。'
-    pf12='请各部门及时做好在途市政工程单和整治工单的清理工作，谢谢！'
+    pf10='整治工单和长时间整治不到位或整治时间超过30天，且涉嫌随意回单的，按工单量考核到部门，≤10单考核50元，每增加10单追加考核50元'
+    pf11='请各部门及时做好在途市政工程单和整治工单的清理工作，谢谢！'
 
 
     paragraph1 = document.add_paragraph(pf1)
@@ -158,6 +158,5 @@ if __name__=="__main__":
     paragraph9 = document.add_paragraph(pf9)
     paragraph10 = document.add_paragraph(pf10)
     paragraph11 = document.add_paragraph(pf11)
-    paragraph12 = document.add_paragraph(pf12)
 
     document.save(os.path.join(path,str(tomonth)+'月'+str(today)+'日'+"市政工程整治工单通报.docx"))

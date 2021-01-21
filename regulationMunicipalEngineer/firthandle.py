@@ -27,14 +27,15 @@ def checkin():
 
 def IsMoreThanSevenDay(x):
     x=str(x)
-    if(x.find('剩余')>0):
+    if(x.find('剩余')>=0):
         return False
-    right=x.find('天')
-    if(right==-1):
-        return False
-    left=x.find('：') if x.find('：')!=-1 else x.find(':')
-    if(int(x[left + 1: right])>=7):
-        return True
+    if(x.find('超时')>=0):
+        right=x.find('天')
+        if(right==-1):
+            return False
+        left=x.find('：') if x.find('：')!=-1 else x.find(':')
+        if(int(x[left + 1: right])>=7):
+            return True
     return False
 
 
@@ -68,7 +69,7 @@ def findDepartmentBygroup(x):
         print(i)
         if x.find(i)>=0:
             return i
-    list=['维护岗','PON','光缆','设备']
+    list=['维护岗','PON','光缆','设备','线路']
     for i in list:
         if x.find(i)>=0:
             return '综维'
