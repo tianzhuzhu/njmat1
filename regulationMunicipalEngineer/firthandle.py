@@ -3,6 +3,7 @@
 import datetime
 import os
 import openpyxl
+import yaml
 import xlrd
 
 import pandas as pd
@@ -17,7 +18,16 @@ def checkin():
     while(file.find(str(tomonth)+"-"+str(today))<0 and file.find(mode)<0):
         file = input("今天是{},请输入需要归档清单原表格绝对路径（格式为{}mm-dd.xlsx）):".format(datetime.date.today().strftime(r"%y-%m-%d"),mode))
     data=pd.read_excel(file,sheet_name='data')
-    matchup=input('工单归属关系表绝对路径（格式为*归属关系.xlsx）:')
+    try:
+        f = open('config.yml','r',encoding='utf-8')
+        cont = f.read()
+        x = yaml.load(cont)
+        matchup=x['relationship']
+        print(matchup)
+    except:
+        matchup=input('工单归属关系表绝对路径（格式为*归属关系.xlsx）:')
+
+
     while(matchup.find('归属关系')<0):
         matchup = input('工单归属关系表绝对路径（格式为*归属关系.xlsx）:')
     matchup=pd.read_excel(matchup,sheet_name="部门")
