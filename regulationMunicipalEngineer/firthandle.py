@@ -27,7 +27,6 @@ def checkin():
     except:
         matchup=input('工单归属关系表绝对路径（格式为*归属关系.xlsx）:')
 
-
     while(matchup.find('归属关系')<0):
         matchup = input('工单归属关系表绝对路径（格式为*归属关系.xlsx）:')
     matchup=pd.read_excel(matchup,sheet_name="部门")
