@@ -86,7 +86,7 @@ def findDepartmentBygroup(x):
     for i in list:
         if x.find(i)>=0:
             return '建设'
-    list = ['秦淮', '鼓楼','雨花台','玄武','栖霞','化工园','建业']
+    list = ['秦淮', '鼓楼','雨花台','玄武','栖霞','化工园','建邺']
     for i in list:
         if x.find(i) >= 0:
             return i
